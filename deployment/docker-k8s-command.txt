@@ -1,0 +1,45 @@
+dotnet build
+dotnet run
+
+# Step 1: Login to Docker registry
+docker login docker-hosted.sebaoffice.ir
+
+# Step 2: Build the Docker image
+docker build -t docker-hosted.sebaoffice.ir/kss-market-data-service:latest .
+
+# Alternative: Build and push in one command (if using buildx)
+docker buildx build --push -t docker-hosted.sebaoffice.ir/kss-market-data-service:latest .
+
+# Step 3: Push the image to registry
+docker push docker-hosted.sebaoffice.ir/kss-market-data-service:latest
+
+# Step 4: Create namespace (if it doesn't exist)
+kubectl create namespace kss-market-data-service
+
+# Step 5: Deploy/restart the application
+kubectl rollout restart deployment/kss-market-data-service -n kss-market-data-service
+
+# Remember: Deploying to groups is a PRO-licensed feature. See https://links.sonatype.com/product-nexus-repository
+
+kubectl get pods -n kss-market-data-service 
+kubectl get secrets -n kss-market-data-service 
+kubectl get pvc -n kss-market-data-service 
+kubectl get configmaps -n kss-market-data-service 
+kubectl get ingress -n kss-market-data-service 
+kubectl get jobs -n kss-market-data-service 
+kubectl get cronjobs -n kss-market-data-service 
+kubectl get svc -n kss-market-data-service 
+kubectl get certificate -n kss-market-data-service 
+kubectl get sts -n kss-market-data-service 
+kubectl get networkpolicy -n kss-market-data-service 
+
+kubectl create secret docker-registry docker-secret \
+  --docker-server=docker-hosted.sebaoffice.ir \
+  --docker-username=YOUR_USERNAME \
+  --docker-password=YOUR_PASSWORD \
+  --namespace kss-market-data-service
+
+kubectl apply -f deployment.yaml -n kss-market-data-service
+
+kubectl delete networkpolicy kss-market-data-service-network-policy -n kss-market-data-service
+kubectl delete secrets docker-secret -n kss-market-data-service
